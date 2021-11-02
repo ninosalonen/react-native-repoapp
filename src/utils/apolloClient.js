@@ -1,31 +1,30 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
-import Constants from 'expo-constants';
-import { setContext } from '@apollo/client/link/context';
-import { relayStylePagination } from '@apollo/client/utilities';
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
+import { relayStylePagination } from '@apollo/client/utilities'
 
-const APOLLO_URI = Constants.manifest.extra.uri;
+const APOLLO_URI = 'http://localhost:5005/graphql'
 
 const httpLink = createHttpLink({
   uri: APOLLO_URI,
-});
+})
 
 const createApolloClient = (authStorage) => {
-  const authLink = setContext(async (_, {headers}) => {
-    try{
-      const accessToken = await authStorage.getAccessToken();
+  const authLink = setContext(async (_, { headers }) => {
+    try {
+      const accessToken = await authStorage.getAccessToken()
       return {
         headers: {
           ...headers,
           authorization: accessToken ? `Bearer ${accessToken}` : '',
         },
-      };
+      }
     } catch (e) {
-      console.log(e);
+      console.log(e)
       return {
         headers,
-      };
+      }
     }
-  });
+  })
 
   const cache = new InMemoryCache({
     typePolicies: {
@@ -40,12 +39,12 @@ const createApolloClient = (authStorage) => {
         },
       },
     },
-  });
+  })
 
   return new ApolloClient({
     link: authLink.concat(httpLink),
     cache,
-  });
-};
+  })
+}
 
-export default createApolloClient;
+export default createApolloClient
